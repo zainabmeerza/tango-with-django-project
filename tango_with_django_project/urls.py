@@ -19,6 +19,7 @@ from django.urls import include
 from rango import views
 
 urlpatterns = [
+    path('about/', views.about, name='about'),
     path('', views.index, name='index'),
     path('rango/', include('rango.urls')),
     # The above maps any URLs starting with rango/ to be handled by rango.
