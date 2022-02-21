@@ -2,9 +2,12 @@ from multiprocessing import context
 from unicodedata import category
 from django.shortcuts import render
 from django.http import HttpResponse
+from rango.forms import CategoryForm
 # Import the Category model
 from rango.models import Category
 from rango.models import Page
+from rango.forms import CategoryForm
+from django.shortcuts import redirect
 # Create your views here.
 
 def index(request):
@@ -27,6 +30,7 @@ def index(request):
     # Note that the first parameter is the template we wish to use.
     return render(request, 'rango/index.html', context=context_dict)
 
+
 def about(request):
     # Construct a dictionary to pass to the template engine as its context.
     # Note the key boldmessagee matches to {{ boldmessage }} in the template!
@@ -36,6 +40,7 @@ def about(request):
     # We make use of the shortcut functioon to make our lives easier.
     # Note that the first parameter is the template we wish to use.
     return render(request, 'rango/about.html', context=context_dict)
+
 
 def show_category(request,category_name_slug):
     # Create a context dicionary which we can pass
@@ -67,3 +72,26 @@ def show_category(request,category_name_slug):
     
     # Go render the response and return it to the client.
     return render(request, 'rango/category.html', context=context_dict)
+
+
+def add_category(request):
+    form = CategoryForm()
+
+    # A HTTP POST?
+    if request.method == 'POST':
+        form = CategoryForm(request.POST)
+
+        # Have we been provided with a valid form?
+        if form.is_valid():
+            # Save the new category to the database.
+            form.save(commit=True)
+            # Now that the category is saved, we could confirm this.
+            # For now, just redirect the user back to the index view.
+            return redirect('/rango/')
+        else:
+            # The supplied form contained errors -
+            print(form.errors)
+    # Will handle the bad form, new form, or no form supplied cases.
+    # Render the form wih error messages (if any).
+    return render(request, 'rango/add_category.html', {'form': form})
+
